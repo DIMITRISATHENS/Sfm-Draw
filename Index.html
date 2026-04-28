@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Κλήρωση — SFM</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:  #060e18; --navy2: #0d1b2a; --navy3: #1a2e45;
+  --steel: #2a4a6b; --steel2:#3a6491; --sky:   #4a9eca;
+  --amber: #f4a261; --amber2:#e76f51; --gold:  #f0c419;
+  --green: #2d9e6b; --green2:#1ef0a0;
+  --white: #f4f7fb; --gray2: #a0aec0; --gray3: #4a5568;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);height:100vh;overflow:hidden;user-select:none;}
+
+/* HEADER */
+.header{height:52px;background:linear-gradient(135deg,var(--navy),var(--navy3),rgba(58,100,145,.4));border-bottom:2px solid var(--amber);display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:0 4px 20px rgba(0,0,0,.5);}
+.header-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:2px;display:flex;align-items:center;gap:10px;}
+.live-dot{width:10px;height:10px;border-radius:50%;background:red;box-shadow:0 0 8px red;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.lbl{color:var(--amber);}
+.header-meta{font-size:12px;color:var(--gray2);}
+.scenario-badge{background:rgba(58,100,145,.4);border:1px solid var(--steel2);color:var(--sky);padding:4px 12px;border-radius:4px;font-size:12px;font-weight:700;}
+.phase-badge{padding:4px 14px;border-radius:4px;font-size:12px;font-weight:700;transition:all .4s;display:none;}
+
+/* MAIN */
+.main{display:grid;grid-template-columns:1fr 300px;height:calc(100vh - 52px);}
+
+/* LEFT */
+.left-area{display:flex;flex-direction:column;padding:10px 12px;gap:10px;overflow:hidden;}
+
+/* STAGE — big reveal box */
+.stage-wrap{
+  background:linear-gradient(135deg,rgba(26,46,69,.8),rgba(42,74,107,.5));
+  border:2px solid rgba(255,255,255,.1);border-radius:14px;
+  padding:14px 20px;display:flex;align-items:center;gap:20px;
+  position:relative;overflow:hidden;flex-shrink:0;min-height:130px;
+}
+.stage-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(244,162,97,.08),transparent 60%);pointer-events:none;}
+.stage-left{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:70px;}
+.stage-icon{font-size:36px;animation:iconPop .4s cubic-bezier(.175,.885,.32,1.275);}
+.stage-ptype{font-size:11px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;background:rgba(255,255,255,.1);color:var(--gray2);}
+.stage-center{flex:1;}
+.stage-phase{display:none;}
+.stage-club{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(24px,2.8vw,38px);color:var(--amber);animation:slideUp .35s ease-out;letter-spacing:.5px;margin-top:4px;}
+.stage-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(32px,3.8vw,56px);line-height:1;color:var(--white);animation:scaleIn .4s cubic-bezier(.175,.885,.32,1.275);}
+.stage-dest{margin-top:12px;display:flex;align-items:baseline;gap:6px;animation:fadeIn .3s ease-out .15s both;}
+.stage-dest-lbl{font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,1.4vw,20px);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray2);}
+.stage-dest-val{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,3.2vw,48px);font-weight:900;color:var(--white);letter-spacing:1px;margin-right:20px;}
+.stage-idle{display:flex;align-items:center;gap:16px;opacity:.3;}
+.stage-idle-icon{font-size:44px;}
+.stage-idle-text{font-size:18px;color:var(--gray2);font-style:italic;}
+
+@keyframes iconPop{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.6);}to{opacity:1;transform:scale(1);}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* SECTORS GRID */
+.sectors-outer{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.sectors-grid{display:grid;gap:8px;flex:1;overflow:hidden;}
+.sector-col{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;}
+.sector-col.active-sector{box-shadow:0 0 24px rgba(244,162,97,.3);border-color:rgba(244,162,97,.5);}
+.sector-head{background:var(--steel);padding:8px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(16px,2vw,26px);letter-spacing:2px;border-bottom:3px solid var(--amber);color:var(--white);display:flex;align-items:center;justify-content:center;gap:6px;}
+.sector-fill-bar{height:3px;background:rgba(255,255,255,.06);transition:all .5s;}
+.sector-slots{flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
+.slot{border-radius:6px;padding:5px 8px;min-height:0;flex:1;display:flex;flex-direction:column;justify-content:center;transition:all .35s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+.slot.empty{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.08);}
+.slot.active-slot{background:rgba(244,162,97,.18);border:2px solid var(--amber);box-shadow:0 0 14px rgba(244,162,97,.4);animation:slotPulse .7s ease-in-out infinite alternate;}
+@keyframes slotPulse{from{box-shadow:0 0 8px rgba(244,162,97,.2);}to{box-shadow:0 0 22px rgba(244,162,97,.6);}}
+.slot.filled{background:rgba(45,158,107,.12);border:1px solid rgba(45,158,107,.35);}
+.slot.filled-new{animation:fillPop .5s cubic-bezier(.175,.885,.32,1.275);}
+/* Flying tile animation */
+@keyframes flyToSlot{
+  0%  {transform:scale(1) translate(0,0);opacity:1;}
+  30% {transform:scale(1.08) translate(0,-8px);opacity:1;}
+  100%{transform:scale(0.85) translate(var(--fly-x),var(--fly-y));opacity:0;}
+}
+.stage-flying{
+  position:fixed;z-index:500;pointer-events:none;
+  background:linear-gradient(135deg,rgba(42,74,107,.95),rgba(26,46,69,.98));
+  border:2px solid var(--amber);border-radius:8px;
+  padding:6px 12px;
+  font-family:'Barlow Condensed',sans-serif;
+  box-shadow:0 4px 24px rgba(244,162,97,.4);
+  display:flex;flex-direction:column;gap:1px;
+}
+.stage-flying .fly-name{font-size:18px;font-weight:900;color:white;line-height:1;}
+.stage-flying .fly-club{font-size:12px;font-weight:700;color:var(--amber);}
+@keyframes slotLand{
+  0%  {transform:scale(1.4);background:rgba(240,196,25,.5);border-color:var(--gold);}
+  60% {transform:scale(1.05);}
+  100%{transform:scale(1);background:rgba(45,158,107,.12);border-color:rgba(45,158,107,.35);}
+}
+@keyframes fillPop{0%{transform:scale(1.08);background:rgba(240,196,25,.35);border-color:var(--gold);}100%{transform:scale(1);background:rgba(45,158,107,.12);border-color:rgba(45,158,107,.35);}}
+
+/* SLOT TEXT — big enough for athletes */
+.slot-num{font-size:clamp(13px,1.4vw,18px);color:var(--white);font-weight:900;line-height:1;opacity:.9;}
+.slot-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(11px,1.2vw,16px);color:var(--white);line-height:1.1;letter-spacing:.3px;}
+.slot-club{font-family:'Barlow Condensed',sans-serif;font-size:clamp(10px,1.1vw,14px);color:var(--sky);line-height:1;margin-top:3px;font-weight:700;letter-spacing:.3px;}
+.slot-ptype{position:absolute;top:4px;right:5px;font-size:clamp(10px,1vw,13px);font-weight:700;color:rgba(255,255,255,.4);}
+
+/* RIGHT PANEL */
+.right-panel{background:var(--navy2);border-left:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow:hidden;}
+
+/* DRUM */
+.drum-section{padding:12px 14px 8px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.drum-row{display:flex;gap:8px;margin-bottom:6px;}
+.drum-box{flex:1;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;}
+.drum-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray3);padding:4px 8px 2px;}
+.drum-window{height:30px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.drum-text{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--white);padding:0 8px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.drum-text.spinning{animation:drumSpin .07s linear infinite;}
+.drum-text.result{color:var(--amber);animation:drumLand .4s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes drumSpin{0%{opacity:1;transform:translateY(0);}49%{opacity:0;transform:translateY(-8px);}50%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes drumLand{from{transform:scale(1.3);color:white;}to{transform:scale(1);color:var(--amber);}}
+
+/* PROGRESS */
+.progress-section{padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.progress-track{background:rgba(255,255,255,.07);border-radius:4px;height:5px;overflow:hidden;}
+.progress-fill{background:linear-gradient(90deg,var(--steel2),var(--amber));height:100%;border-radius:4px;transition:width .5s ease;box-shadow:0 0 8px rgba(244,162,97,.4);}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.progress-text{font-size:10px;color:var(--gray2);}
+.progress-pct{font-size:11px;font-weight:700;color:var(--amber);}
+
+/* PHASE STEPS */
+.phase-steps{padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:5px;flex-shrink:0;}
+.phase-step{flex:1;padding:5px 4px;border-radius:6px;text-align:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);transition:all .3s;}
+.phase-step .ps-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gray3);}
+.phase-step .ps-count{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--gray3);}
+.phase-step.active{background:rgba(244,162,97,.1);border-color:var(--amber);}
+.phase-step.active .ps-label,.phase-step.active .ps-count{color:var(--amber);}
+.phase-step.done{background:rgba(45,158,107,.1);border-color:rgba(45,158,107,.3);}
+.phase-step.done .ps-label,.phase-step.done .ps-count{color:var(--green);}
+
+/* WAITING */
+.waiting-section{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:6px 0;}
+.waiting-header{display:flex;justify-content:space-between;align-items:center;padding:0 14px 5px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray3);flex-shrink:0;}
+.waiting-badge{background:var(--steel);color:var(--white);padding:1px 7px;border-radius:10px;font-size:10px;}
+.waiting-list{flex:1;overflow-y:auto;padding:0 8px;}
+.waiting-list::-webkit-scrollbar{width:3px;}
+.waiting-list::-webkit-scrollbar-thumb{background:var(--steel);border-radius:2px;}
+.w-phase-title{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 6px 2px;opacity:.6;}
+.w-club-block{margin-bottom:5px;}
+.w-club-name{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:2px;}
+.w-athlete{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;font-size:11px;transition:all .25s;}
+.w-athlete.pending{color:var(--gray3);}
+.w-athlete.current{background:rgba(244,162,97,.12);color:var(--amber);font-weight:700;}
+.w-athlete.done{color:rgba(255,255,255,.15);text-decoration:line-through;}
+.w-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:var(--gray3);transition:all .3s;}
+.w-athlete.current .w-dot{background:var(--amber);box-shadow:0 0 5px var(--amber);}
+.w-athlete.done .w-dot{opacity:.2;}
+
+/* CONTROLS */
+.controls{padding:10px 12px;border-top:2px solid rgba(244,162,97,.3);background:rgba(0,0,0,.2);display:flex;flex-direction:column;gap:7px;flex-shrink:0;}
+.controls-row{display:flex;gap:6px;align-items:center;}
+.btn{padding:8px 14px;border:none;border-radius:7px;font-size:12px;font-weight:700;font-family:'Barlow',sans-serif;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.1);}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.btn-amber{background:var(--amber);color:var(--navy);}
+.btn-steel{background:var(--steel2);color:white;}
+.btn-gray{background:rgba(255,255,255,.08);color:var(--white);}
+.btn-next{flex:1;padding:10px;font-size:14px;justify-content:center;}
+.speed-row{display:flex;align-items:center;gap:8px;}
+.speed-label{font-size:10px;color:var(--gray3);white-space:nowrap;}
+.speed-slider{flex:1;-webkit-appearance:none;height:3px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;}
+.speed-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--amber);cursor:pointer;}
+.kbd-hint{font-size:9px;color:var(--gray3);text-align:center;}
+.tts-row{display:flex;align-items:center;gap:10px;margin-top:2px;}
+.tts-label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray2);cursor:pointer;user-select:none;}
+.tts-label input[type="checkbox"]{accent-color:var(--amber);width:14px;height:14px;cursor:pointer;}
+.tts-voice-label{font-size:10px;color:var(--gray3);font-style:italic;}
+kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:3px;padding:1px 5px;font-size:9px;font-family:monospace;}
+
+/* INTRO */
+.intro-screen{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 40% 40%,var(--navy3),var(--navy) 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+.intro-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:58px;letter-spacing:4px;background:linear-gradient(135deg,var(--amber),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:introFade 1s ease-out;}
+@keyframes introFade{from{opacity:0;transform:translateY(20px) scale(.9);}to{opacity:1;transform:none;}}
+.intro-sub{font-size:14px;color:var(--gray2);letter-spacing:1px;animation:introFade 1s ease-out .2s both;}
+.intro-upload{border:2px dashed rgba(255,255,255,.15);border-radius:14px;padding:26px 44px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(255,255,255,.02);animation:introFade 1s ease-out .4s both;}
+.intro-upload:hover{border-color:var(--amber);background:rgba(244,162,97,.05);}
+.intro-upload input{display:none;}
+.intro-upload-icon{font-size:38px;margin-bottom:8px;}
+.intro-upload-text{font-weight:700;font-size:15px;color:var(--white);}
+.intro-upload-sub{font-size:11px;color:var(--gray3);margin-top:4px;}
+.intro-stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.intro-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 20px;text-align:center;min-width:95px;}
+.intro-stat-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:34px;color:var(--amber);}
+.intro-stat-lbl{font-size:10px;color:var(--gray3);text-transform:uppercase;letter-spacing:.5px;}
+.intro-start-btn{padding:14px 40px;font-size:16px;}
+
+/* ── SUPABASE RACE LIST ── */
+.sb-race-list{display:flex;flex-direction:column;gap:8px;max-width:560px;width:100%;max-height:55vh;overflow-y:auto;padding:0 4px;animation:introFade 1s ease-out .4s both;}
+.sb-race-list::-webkit-scrollbar{width:4px;}
+.sb-race-list::-webkit-scrollbar-thumb{background:var(--steel);border-radius:2px;}
+.sb-race-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:13px 16px;cursor:pointer;transition:all .2s;position:relative;display:flex;flex-direction:column;gap:3px;}
+.sb-race-card:hover{border-color:var(--amber);background:rgba(244,162,97,.07);transform:translateY(-2px);}
+.sb-race-card.locked{opacity:.5;cursor:default;}
+.sb-race-card.locked:hover{transform:none;border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.04);}
+.sb-rc-round{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--amber);text-transform:uppercase;}
+.sb-rc-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;color:var(--white);}
+.sb-rc-meta{font-size:11px;color:var(--gray2);display:flex;gap:10px;flex-wrap:wrap;}
+.sb-rc-badge{position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.badge-ready{background:rgba(45,158,107,.15);color:#1ef0a0;border:1px solid rgba(45,158,107,.3);}
+.badge-played{background:rgba(100,100,130,.2);color:#8899aa;border:1px solid rgba(100,100,130,.3);}
+.badge-nodraw{background:rgba(232,64,64,.1);color:#e84040;border:1px solid rgba(232,64,64,.2);}
+.sb-loading{text-align:center;color:var(--gray2);padding:30px;animation:introFade 1s ease-out .4s both;}
+.sb-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sb-error{color:#e84040;font-size:13px;text-align:center;padding:16px;border:1px solid rgba(232,64,64,.2);border-radius:8px;background:rgba(232,64,64,.05);}
+/* ── LOCK MODAL ── */
+#lockModal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;pointer-events:none;}
+#lockModal.open{opacity:1;pointer-events:all;}
+.lock-box{background:var(--navy2);border:1px solid rgba(255,255,255,.08);border-top:3px solid var(--amber);border-radius:14px;padding:30px 34px;max-width:400px;width:90%;text-align:center;transform:scale(.92);transition:transform .25s;}
+#lockModal.open .lock-box{transform:scale(1);}
+.lock-icon{font-size:44px;margin-bottom:10px;}
+.lock-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:2px;color:var(--white);margin-bottom:6px;}
+.lock-desc{font-size:13px;color:var(--gray2);line-height:1.5;margin-bottom:4px;}
+.lock-played-at{font-size:11px;color:var(--gray3);margin-bottom:18px;}
+.lock-input{width:100%;background:var(--navy3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:20px;letter-spacing:4px;text-align:center;text-transform:uppercase;outline:none;margin-bottom:14px;transition:border-color .18s;}
+.lock-input:focus{border-color:var(--amber);}
+.lock-input.err{border-color:#e84040;animation:shake .3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+.lock-actions{display:flex;gap:8px;}
+.lock-btn{flex:1;padding:10px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .18s;border:none;}
+.lock-btn.ok{background:var(--amber);color:var(--navy);}
+.lock-btn.ok:hover{filter:brightness(1.1);}
+.lock-btn.cancel{background:rgba(255,255,255,.06);color:var(--white);border:1px solid rgba(255,255,255,.1);}
+.lock-btn.cancel:hover{border-color:var(--gray2);}
+
+/* DONE */
+.done-overlay{position:fixed;inset:0;z-index:200;background:rgba(6,14,24,.93);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+.done-overlay.show{display:flex;}
+.done-icon{font-size:70px;animation:iconPop .6s cubic-bezier(.175,.885,.32,1.275) .2s both;}
+.done-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:54px;color:var(--green2);letter-spacing:3px;animation:scaleIn .6s cubic-bezier(.175,.885,.32,1.275) .3s both;text-align:center;}
+.done-sub{font-size:16px;color:var(--gray2);animation:fadeIn .4s ease-out .6s both;}
+
+/* REVIEW BANNER — εμφανίζεται 60s μετά το finish, πριν το done overlay */
+#reviewBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:150;
+  background:linear-gradient(135deg,rgba(6,14,24,.96),rgba(26,46,69,.98));
+  border-top:2px solid var(--amber);
+  padding:10px 20px;
+  display:none;
+  align-items:center;
+  gap:14px;
+}
+#reviewBanner.show{display:flex;}
+.rb-icon{font-size:28px;flex-shrink:0;}
+.rb-text{flex:1;}
+.rb-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:1px;color:var(--green2);}
+.rb-sub{font-size:12px;color:var(--gray2);margin-top:1px;}
+.rb-countdown{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:42px;font-weight:900;
+  color:var(--amber);
+  min-width:64px;text-align:center;
+  line-height:1;
+}
+.rb-bar-wrap{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:6px;overflow:hidden;}
+.rb-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:2px;transition:width 1s linear;}
+
+/* FLASH */
+.flash-overlay{position:fixed;inset:0;z-index:300;background:rgba(244,162,97,.15);pointer-events:none;opacity:0;transition:opacity .1s;}
+.flash-overlay.on{opacity:1;}
+
+/* PARTICLES */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;animation:floatUp linear infinite;opacity:0;}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:.4;}90%{opacity:.2;}100%{transform:translateY(-10vh) scale(1.2);opacity:0;}}
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div class="flash-overlay" id="flashEl"></div>
+
+<!-- INTRO -->
+<div class="intro-screen" id="introScreen">
+  <div class="intro-logo">🎣 LIVE ΚΛΗΡΩΣΗ</div>
+  <div class="intro-sub" id="introSubTitle">Sport Fishing Manager · Live Draw Presentation</div>
+  <div id="sbRaceContainer" class="sb-loading">
+    <div class="sb-spinner"></div>
+    <div>Φόρτωση αγώνων…</div>
+  </div>
+  <div class="intro-stats" id="introStats" style="display:none;"></div>
+  <button class="btn btn-amber intro-start-btn" id="startBtn" style="display:none;">🎲 Έναρξη Live Κλήρωσης</button>
+</div>
+
+<!-- REVIEW BANNER — 60s εμφάνιση τελικής εικόνας -->
+<div id="reviewBanner">
+  <div class="rb-icon">🏆</div>
+  <div class="rb-text">
+    <div class="rb-title">ΚΛΗΡΩΣΗ ΟΛΟΚΛΗΡΩΘΗΚΕ — Διαβάστε τις θέσεις σας</div>
+    <div class="rb-sub" id="rbSub">—</div>
+    <div class="rb-bar-wrap"><div class="rb-bar" id="rbBar" style="width:100%"></div></div>
+  </div>
+  <div class="rb-countdown" id="rbCountdown">60</div>
+</div>
+
+<!-- LOCK MODAL -->
+<div id="lockModal">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">ΚΛΕΙΔΩΜΕΝΗ ΚΛΗΡΩΣΗ</div>
+    <div class="lock-desc">Αυτή η κλήρωση έχει ήδη παρουσιαστεί.<br>Εισάγετε τον κωδικό αυθεντικοποίησης:</div>
+    <div class="lock-played-at" id="lockPlayedAt"></div>
+    <input class="lock-input" id="lockInput" type="text" placeholder="AUTH CODE" maxlength="12"
+           onkeydown="if(event.key==='Enter')lockConfirm();if(event.key==='Escape')lockClose();">
+    <div class="lock-actions">
+      <button class="lock-btn cancel" onclick="lockClose()">ΑΚΥΡΟ</button>
+      <button class="lock-btn ok" onclick="lockConfirm()">ΞΕΚΛΕΙΔΩΜΑ</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="header-logo"><div class="live-dot"></div><span class="lbl">LIVE</span> ΚΛΗΡΩΣΗ</div>
+    <div class="header-meta" id="headerMeta">—</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <div class="scenario-badge" id="scenarioBadge">—</div>
+    <div class="phase-badge" id="phaseBadge"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="left-area">
+    <div class="stage-wrap" id="stageWrap">
+      <div class="stage-idle"><div class="stage-idle-icon">🎲</div><div class="stage-idle-text">Αναμονή έναρξης…</div></div>
+    </div>
+    <div class="sectors-outer">
+      <div class="sectors-grid" id="sectorsGrid"></div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="drum-section">
+      <div class="drum-row">
+        <div class="drum-box"><div class="drum-label">Σύλλογος</div><div class="drum-window"><div class="drum-text" id="drumClub">—</div></div></div>
+        <div class="drum-box"><div class="drum-label">Αθλητής</div><div class="drum-window"><div class="drum-text" id="drumAthlete">—</div></div></div>
+      </div>
+      <div class="drum-row">
+        <div class="drum-box" style="flex:0.7;"><div class="drum-label">Τομέας</div><div class="drum-window"><div class="drum-text" id="drumSector">—</div></div></div>
+        <div class="drum-box"><div class="drum-label">Θέση</div><div class="drum-window"><div class="drum-text" id="drumPosition">—</div></div></div>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-info"><div class="progress-text" id="progressText">0 / 0</div><div class="progress-pct" id="progressPct">0%</div></div>
+    </div>
+    <div class="phase-steps" id="phaseSteps"></div>
+    <div class="waiting-section">
+      <div class="waiting-header"><span>Αναμένουν</span><span class="waiting-badge" id="waitingCount">0</span></div>
+      <div class="waiting-list" id="waitingList"></div>
+    </div>
+    <div class="controls">
+      <div class="controls-row">
+        <button class="btn btn-amber btn-next" id="btnNext" disabled>▶ Επόμενο</button>
+        <button class="btn btn-steel" id="btnAuto" disabled>⏩ Auto</button>
+        <button class="btn btn-gray" style="padding:8px 10px;" id="btnSkip" disabled>⏭</button>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Ταχύτητα:</span>
+        <input type="range" class="speed-slider" id="speedSlider" min="500" max="4000" value="2000" step="100">
+        <span class="speed-label" id="speedVal">2.0s</span>
+      </div>
+      <div class="tts-row">
+        <label class="tts-label">
+          <input type="checkbox" id="ttsCheck" onchange="toggleTTS(this.checked)">
+          <span>🔊 Ανακοίνωση</span>
+        </label>
+        <span class="tts-voice-label" id="ttsVoiceLabel"></span>
+      </div>
+      <div class="kbd-hint"><kbd>Space</kbd>/<kbd>→</kbd> Επόμενο &nbsp; <kbd>A</kbd> Auto &nbsp; <kbd>Esc</kbd> Παράλειψη</div>
+    </div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="done-overlay" id="doneOverlay">
+  <div class="done-icon">🏆</div>
+  <div class="done-title">ΚΛΗΡΩΣΗ<br>ΟΛΟΚΛΗΡΩΘΗΚΕ!</div>
+  <div class="done-sub" id="doneSub">—</div>
+  <button class="btn btn-amber" id="doneCloseBtn" style="margin-top:16px;font-size:14px;padding:12px 28px;">✕ Κλείσιμο</button>
+</div>
+
+<script>
+// ── STATE
+let raceData=null, drawSteps=[], phases=[], currentStep=-1, autoTimer=null, isAuto=false, autoDelay=2000;
+let ttsEnabled=false, ttsVoice=null;
+
+// ── TTS
+function initTTS(){
+  if(!window.speechSynthesis) return;
+  const tryLoad=()=>{
+    const voices=speechSynthesis.getVoices();
+    ttsVoice=voices.find(v=>v.lang.startsWith('el'))||voices.find(v=>v.lang.startsWith('el-'))||null;
+    const lbl=document.getElementById('ttsVoiceLabel');
+    if(lbl) lbl.textContent=ttsVoice?`(${ttsVoice.name.substring(0,22)})`:'(system)';
+  };
+  speechSynthesis.onvoiceschanged=tryLoad;
+  tryLoad();
+}
+function toggleTTS(on){
+  ttsEnabled=on;
+  if(!on&&window.speechSynthesis) speechSynthesis.cancel();
+}
+function speakAthlete(step){
+  if(!ttsEnabled||!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const a=step.athlete;
+  const text=`${a.lastname} ${a.firstname}. Τομέας ${step.sector}. Θέση ${step.position}.`;
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang='el-GR'; utt.rate=0.92; utt.pitch=1.0; utt.volume=1.0;
+  if(ttsVoice) utt.voice=ttsVoice;
+  speechSynthesis.speak(utt);
+}
+
+// ── PARTICLES
+(function(){
+  const c=document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');p.className='particle';
+    const s=Math.random()*4+2;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${['#f4a261','#4a9eca','#2d9e6b','#f0c419'][Math.floor(Math.random()*4)]};animation-duration:${Math.random()*20+15}s;animation-delay:-${Math.random()*20}s;`;
+    c.appendChild(p);
+  }
+})();
+
+// ── DRAG & DROP
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f&&f.name.endsWith('.json')) readFile(f);
+});
+
+// ── LOAD
+function readFile(file){
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      raceData=JSON.parse(ev.target.result);
+      showIntroInfo();
+    }catch(x){alert('❌ Μη έγκυρο JSON');}
+  };
+  r.readAsText(file);
+}
+
+function showIntroInfo(){
+  const aths=raceData.athletes.filter(a=>!a._virtual);
+  const secs=raceData.sectors||[];
+  const clubs=[...new Set(aths.map(a=>a.club).filter(Boolean))];
+  const sc=raceData.competition?.scenario||'?';
+  const title=raceData.competition?.title||'';
+  if(title) document.getElementById('introSubTitle').textContent=title;
+  const stats=[{num:aths.length,lbl:'Αθλητές'},{num:secs.length,lbl:'Τομείς'},{num:clubs.length,lbl:'Σύλλογοι'},{num:'Σ'+sc,lbl:'Σενάριο'}];
+  const box=document.getElementById('introStats');
+  box.innerHTML=stats.map(s=>`<div class="intro-stat"><div class="intro-stat-num">${s.num}</div><div class="intro-stat-lbl">${s.lbl}</div></div>`).join('');
+  box.style.display='flex';
+  document.getElementById('startBtn').style.display='inline-flex';
+}
+
+// ── BUILD STEPS
+function isOmadiko(a){const pt=(a.participationType||'AO').toUpperCase();return pt==='AO'||pt==='O';}
+
+function buildSteps(){
+  const sc=parseInt(raceData.competition?.scenario)||1;
+
+  // ── SUPABASE REPLAY: σενάριο 99 = παρουσίαση ΑΠΟ αποθηκευμένες θέσεις ──
+  if(sc===99) return sbBuildStepsFromDB();
+  const aths=raceData.athletes.filter(a=>!a._virtual&&a.position);
+  const N=raceData.sectors.length;
+
+  if(sc===3||sc===6){
+    const clubMap={};
+    aths.forEach(a=>{if(!isOmadiko(a))return;const c=a.club||'—';if(!clubMap[c])clubMap[c]=[];clubMap[c].push(a);});
+    const placed=new Set();
+    // Φάση 1: τυχαία σειρά συλλόγων → όλοι οι αθλητές του (τυχαία σειρά) → επόμενος σύλλογος
+    const ph1Clubs=Object.keys(clubMap).filter(c=>clubMap[c].length===N).sort(()=>Math.random()-.5);
+    const ph1=[];
+    ph1Clubs.forEach(c=>{
+      const shuffled=[...clubMap[c]].sort(()=>Math.random()-.5);
+      shuffled.forEach(a=>{ph1.push(a);placed.add(a.id);});
+    });
+    // Φάση 2: τυχαία σειρά συλλόγων → όλοι οι αθλητές του (τυχαία σειρά) → επόμενος σύλλογος
+    const ph2Clubs=Object.keys(clubMap).filter(c=>clubMap[c].length===N-1).sort(()=>Math.random()-.5);
+    const ph2=[];
+    ph2Clubs.forEach(c=>{
+      const shuffled=[...clubMap[c]].sort(()=>Math.random()-.5);
+      shuffled.forEach(a=>{ph2.push(a);placed.add(a.id);});
+    });
+    // Φάση 3: υπόλοιποι ανακατεμένοι
+    const ph3=aths.filter(a=>!placed.has(a.id)).sort(()=>Math.random()-.5);
+    const mk=(label,color,arr)=>({label,color,steps:arr.map(a=>({athlete:a,club:a.club||'—',sector:a.sector,position:a.position}))});
+    const res=[];
+    if(ph1.length)res.push(mk('Φάση 1 — Πλήρεις Σύλλογοι','#f0c419',ph1));
+    if(ph2.length)res.push(mk('Φάση 2 — Σχεδόν Πλήρεις','#4a9eca',ph2));
+    if(ph3.length)res.push(mk('Φάση 3 — Υπόλοιποι','#a0aec0',ph3));
+    return res;
+  } else if(sc===4||sc===5){
+    const byG={};
+    aths.forEach(a=>{const g=a.group||'—';if(!byG[g])byG[g]=[];byG[g].push(a);});
+    const noG=byG['—']||[];delete byG['—'];
+    const res=[];
+    Object.keys(byG).sort().forEach(g=>res.push({label:`Group ${g}`,color:'#f4a261',steps:byG[g].map(a=>({athlete:a,club:a.club||'—',sector:a.sector,position:a.position}))}));
+    if(noG.length)res.push({label:'Χωρίς Group',color:'#a0aec0',steps:noG.map(a=>({athlete:a,club:a.club||'—',sector:a.sector,position:a.position}))});
+    return res;
+  } else {
+    const byC={};
+    aths.forEach(a=>{const c=a.club||'—';if(!byC[c])byC[c]=[];byC[c].push(a);});
+    const steps=[];
+    Object.keys(byC).forEach(c=>byC[c].forEach(a=>steps.push({athlete:a,club:c,sector:a.sector,position:a.position})));
+    return [{label:'Κλήρωση',color:'#f4a261',steps}];
+  }
+}
+
+// ── START
+function startVisualization(){
+  document.getElementById('introScreen').style.display='none';
+  const comp=raceData.competition||{};
+  document.getElementById('headerMeta').textContent=[comp.title,comp.date,comp.location].filter(Boolean).join(' · ')||'—';
+  document.getElementById('scenarioBadge').textContent='Σενάριο '+(comp.scenario||'?');
+
+  buildSectorsGrid();
+
+  phases=buildSteps();
+  drawSteps=[];
+  phases.forEach((ph,pi)=>ph.steps.forEach(s=>drawSteps.push({...s,phaseIdx:pi,phaseLabel:ph.label,phaseColor:ph.color})));
+
+  buildWaitingList();
+  buildPhaseIndicators();
+  updateProgress();
+
+  document.getElementById('btnNext').disabled=false;
+  document.getElementById('btnAuto').disabled=false;
+  document.getElementById('btnSkip').disabled=false;
+}
+
+// ── SECTORS GRID
+function buildSectorsGrid(){
+  const grid=document.getElementById('sectorsGrid');
+  const secs=raceData.sectors||[];
+  const N=secs.length;
+  grid.style.gridTemplateColumns=`repeat(${Math.min(N,8)},1fr)`;
+  grid.innerHTML='';
+  secs.forEach(sec=>{
+    const col=document.createElement('div');col.className='sector-col';col.id=`sec-${sec.name}`;
+    const head=document.createElement('div');head.className='sector-head';head.innerHTML=`<span>Τομέας</span><span>${sec.name}</span>`;
+    const bar=document.createElement('div');bar.className='sector-fill-bar';bar.id=`bar-${sec.name}`;
+    const slots=document.createElement('div');slots.className='sector-slots';
+    for(let p=sec.pegStart;p<=sec.pegEnd;p++){
+      const s=document.createElement('div');s.className='slot empty';s.id=`slot-${sec.name}-${p}`;
+      s.innerHTML=`<div class="slot-num">${p}</div>`;
+      slots.appendChild(s);
+    }
+    col.appendChild(head);col.appendChild(bar);col.appendChild(slots);
+    grid.appendChild(col);
+  });
+}
+
+// ── WAITING LIST
+function buildWaitingList(){
+  const list=document.getElementById('waitingList');list.innerHTML='';
+  let gi=0;
+  phases.forEach(ph=>{
+    const phDiv=document.createElement('div');
+    const title=document.createElement('div');title.className='w-phase-title';title.textContent=ph.label;title.style.color=ph.color;phDiv.appendChild(title);
+    const byC={};
+    ph.steps.forEach((s,li)=>{const c=s.club||'—';if(!byC[c])byC[c]=[];byC[c].push({s,gi:gi+li});});
+    gi+=ph.steps.length;
+    Object.keys(byC).forEach(club=>{
+      const cb=document.createElement('div');cb.className='w-club-block';
+      const cn=document.createElement('div');cn.className='w-club-name';cn.textContent=club;cb.appendChild(cn);
+      byC[club].forEach(({s,gi:idx})=>{
+        const a=document.createElement('div');a.className='w-athlete pending';a.id=`wait-${idx}`;
+        a.innerHTML=`<div class="w-dot"></div><span>${s.athlete.lastname} ${s.athlete.firstname}</span>`;
+        cb.appendChild(a);
+      });
+      phDiv.appendChild(cb);
+    });
+    list.appendChild(phDiv);
+  });
+  document.getElementById('waitingCount').textContent=drawSteps.length;
+}
+
+// ── PHASE INDICATORS
+function buildPhaseIndicators(){
+  const box=document.getElementById('phaseSteps');box.innerHTML='';
+  phases.forEach((ph,i)=>{
+    const div=document.createElement('div');div.className='phase-step';div.id=`pstep-${i}`;
+    div.innerHTML=`<div class="ps-label">${ph.label.split('—')[0].trim()}</div><div class="ps-count">${ph.steps.length}</div>`;
+    box.appendChild(div);
+  });
+}
+
+function updatePhaseIndicator(step){
+  phases.forEach((_,i)=>{
+    const el=document.getElementById(`pstep-${i}`);if(!el)return;
+    const before=phases.slice(0,i).reduce((s,p)=>s+p.steps.length,0);
+    if(currentStep<before)el.className='phase-step';
+    else if(currentStep<before+phases[i].steps.length)el.className='phase-step active';
+    else el.className='phase-step done';
+  });
+  const badge=document.getElementById('phaseBadge');
+  badge.style.display='block';badge.textContent=step.phaseLabel;
+  badge.style.background=step.phaseColor+'22';badge.style.border=`1px solid ${step.phaseColor}55`;badge.style.color=step.phaseColor;
+}
+
+// ── NEXT STEP
+async function nextStep(){
+  if(currentStep>=drawSteps.length-1){finishVisualization();return;}
+  document.getElementById('btnNext').disabled=true;
+  currentStep++;
+  const step=drawSteps[currentStep];
+  const a=step.athlete;
+  const name=`${a.lastname} ${a.firstname}`;
+
+  updatePhaseIndicator(step);
+  updateProgress();
+
+  // mark current in waiting list
+  const prev=document.getElementById(`wait-${currentStep-1}`);if(prev)prev.className='w-athlete done';
+  const cur=document.getElementById(`wait-${currentStep}`);if(cur){cur.className='w-athlete current';cur.scrollIntoView({behavior:'smooth',block:'nearest'});}
+
+  const slotEl=document.getElementById(`slot-${step.sector}-${step.position}`);
+  const secEl=document.getElementById(`sec-${step.sector}`);
+
+  // drums - NO slot highlight yet
+  await drum('drumClub',step.club,550);
+  await drum('drumAthlete',name,750);
+  await drum('drumSector',`Τομέας ${step.sector}`,400);
+  await drum('drumPosition',`Θέση ${step.position}`,350);
+
+  // stage reveal
+  showStage(step);
+  flash();
+
+  // fly tile from stage to slot
+  await delay(300);
+  await flyToSlot(step, a);
+
+  // TTS ανακοίνωση
+  speakAthlete(step);
+
+  // fill slot with land animation
+  if(slotEl){
+    slotEl.className='slot filled';
+    slotEl.style.animation='slotLand .6s cubic-bezier(.175,.885,.32,1.275)';
+    slotEl.innerHTML=`<div class="slot-num">${step.position}</div><div class="slot-name">${a.lastname} ${a.firstname}</div><div class="slot-club">${a.club||''}</div><div class="slot-ptype">${a.participationType||'AO'}</div>`;
+    setTimeout(()=>slotEl.style.animation='',700);
+  }
+  if(secEl)secEl.classList.remove('active-sector');
+
+  // update fill bar
+  const sec=raceData.sectors.find(s=>s.name===step.sector);
+  if(sec){
+    const total=sec.pegEnd-sec.pegStart+1;
+    const filled=raceData.athletes.filter(at=>at.sector===step.sector&&at.position).length;
+    const bar=document.getElementById(`bar-${step.sector}`);
+    if(bar)bar.style.background=`linear-gradient(90deg,var(--green) ${Math.round(filled/total*100)}%,rgba(255,255,255,.05) 0%)`;
+  }
+
+  // done
+  const waitEl=document.getElementById(`wait-${currentStep}`);if(waitEl)waitEl.className='w-athlete done';
+  document.getElementById('waitingCount').textContent=Math.max(0,drawSteps.length-currentStep-1);
+
+  if(currentStep>=drawSteps.length-1){await delay(700);finishVisualization();return;}
+  document.getElementById('btnNext').disabled=false;
+  if(isAuto)autoTimer=setTimeout(nextStep,autoDelay);
+}
+
+// ── FLY TILE: animated card from stage to slot
+function flyToSlot(step, a){
+  return new Promise(res=>{
+    const slotEl=document.getElementById(`slot-${step.sector}-${step.position}`);
+    const stageEl=document.getElementById('stageWrap');
+    if(!slotEl||!stageEl){res();return;}
+
+    const fromR=stageEl.getBoundingClientRect();
+    const toR=slotEl.getBoundingClientRect();
+
+    // Create flying tile at stage position
+    const tile=document.createElement('div');
+    tile.className='stage-flying';
+    tile.innerHTML=`<div class="fly-name">${a.lastname} ${a.firstname}</div><div class="fly-club">${step.club||''}</div>`;
+    tile.style.cssText+=`
+      left:${fromR.left+fromR.width*0.05}px;
+      top:${fromR.top+fromR.height*0.15}px;
+      width:${Math.min(fromR.width*0.6,220)}px;
+    `;
+    document.body.appendChild(tile);
+
+    // Compute vector to slot center
+    const tileR=tile.getBoundingClientRect();
+    const dx=toR.left+toR.width/2 - (tileR.left+tileR.width/2);
+    const dy=toR.top+toR.height/2 - (tileR.top+tileR.height/2);
+
+    tile.style.setProperty('--fly-x', dx+'px');
+    tile.style.setProperty('--fly-y', dy+'px');
+
+    // Highlight slot as target during flight
+    slotEl.className='slot active-slot';
+
+    // Trigger animation
+    requestAnimationFrame(()=>{
+      tile.style.animation='flyToSlot 0.55s cubic-bezier(.4,0,.6,1) forwards';
+      setTimeout(()=>{
+        tile.remove();
+        slotEl.className='slot';
+        res();
+      },580);
+    });
+  });
+}
+
+// ── DRUM
+function drum(elId,text,dur){
+  return new Promise(res=>{
+    const el=document.getElementById(elId);
+    const pool=getPool(elId);
+    let elapsed=0;
+    el.className='drum-text spinning';
+    const t=setInterval(()=>{
+      el.textContent=pool[Math.floor(Math.random()*pool.length)]||'—';
+      elapsed+=70;
+      if(elapsed>=dur){clearInterval(t);el.className='drum-text result';el.textContent=text;setTimeout(res,250);}
+    },70);
+  });
+}
+function getPool(id){
+  if(!raceData)return['...'];
+  const aths=raceData.athletes.filter(a=>!a._virtual);
+  if(id==='drumClub')return[...new Set(aths.map(a=>a.club).filter(Boolean))];
+  if(id==='drumSector')return(raceData.sectors||[]).map(s=>`Τομέας ${s.name}`);
+  if(id==='drumPosition'){const p=[];(raceData.sectors||[]).forEach(s=>{for(let i=s.pegStart;i<=s.pegEnd;i++)p.push(`Θέση ${i}`);});return p;}
+  return aths.map(a=>`${a.lastname} ${a.firstname}`);
+}
+
+// ── STAGE
+function showStage(step){
+  const a=step.athlete;
+  const pt=(a.participationType||'AO').toUpperCase();
+  document.getElementById('stageWrap').innerHTML=`
+    <div class="stage-left">
+      <div class="stage-icon">🎣</div>
+      <div class="stage-ptype">${pt}</div>
+    </div>
+    <div class="stage-center">
+      <div class="stage-name">${a.lastname} ${a.firstname}</div>
+      <div class="stage-club">${step.club}</div>
+      <div class="stage-dest">
+        <span class="stage-dest-lbl">Τομέας</span>
+        <span class="stage-dest-val">${step.sector}</span>
+        <span class="stage-dest-lbl">Θέση</span>
+        <span class="stage-dest-val">${step.position}</span>
+      </div>
+    </div>`;
+}
+
+// ── PROGRESS
+function updateProgress(){
+  const pct=drawSteps.length?Math.round((currentStep+1)/drawSteps.length*100):0;
+  document.getElementById('progressFill').style.width=Math.max(0,pct)+'%';
+  document.getElementById('progressText').textContent=`${Math.max(0,currentStep+1)} / ${drawSteps.length}`;
+  document.getElementById('progressPct').textContent=Math.max(0,pct)+'%';
+}
+
+// ── AUTO
+function toggleAuto(){
+  isAuto=!isAuto;
+  const btn=document.getElementById('btnAuto');
+  if(isAuto){btn.textContent='⏸ Παύση';btn.className='btn btn-amber';if(currentStep<drawSteps.length-1)nextStep();}
+  else{btn.textContent='⏩ Auto';btn.className='btn btn-steel';if(autoTimer)clearTimeout(autoTimer);}
+}
+
+// ── SKIP
+function skipAll(){
+  if(autoTimer)clearTimeout(autoTimer);isAuto=false;
+  for(let i=currentStep+1;i<drawSteps.length;i++){
+    const s=drawSteps[i];const a=s.athlete;
+    const sl=document.getElementById(`slot-${s.sector}-${s.position}`);
+    if(sl){sl.className='slot filled';sl.innerHTML=`<div class="slot-num">${s.position}</div><div class="slot-name">${a.lastname} ${a.firstname}</div><div class="slot-club">${a.club||''}</div><div class="slot-ptype">${a.participationType||'AO'}</div>`;}
+    const w=document.getElementById(`wait-${i}`);if(w)w.className='w-athlete done';
+  }
+  currentStep=drawSteps.length-1;
+  updateProgress();
+  document.getElementById('waitingCount').textContent='0';
+  finishVisualization();
+}
+
+// ── FLASH
+function flash(){const el=document.getElementById('flashEl');el.classList.add('on');setTimeout(()=>el.classList.remove('on'),130);}
+
+// ── FINISH
+const REVIEW_SECS = 60; // δευτερόλεπτα εμφάνισης τελικής εικόνας
+let _reviewTimer = null;
+
+function finishVisualization(){
+  if(autoTimer)clearTimeout(autoTimer);isAuto=false;
+  if(_reviewTimer)clearTimeout(_reviewTimer);
+  ['btnNext','btnAuto','btnSkip'].forEach(id=>document.getElementById(id).disabled=true);
+
+  // ── 1. Εμφάνισε το review banner αμέσως ──────────────────────
+  const comp = raceData.competition||{};
+  const banner = document.getElementById('reviewBanner');
+  document.getElementById('rbSub').textContent =
+    `${drawSteps.length} αθλητές · ${comp.title||''}`;
+  banner.classList.add('show');
+
+  // ── 2. Countdown 60s ─────────────────────────────────────────
+  let secsLeft = REVIEW_SECS;
+  const cdEl  = document.getElementById('rbCountdown');
+  const barEl = document.getElementById('rbBar');
+  cdEl.textContent = secsLeft;
+  barEl.style.transition = 'none';
+  barEl.style.width = '100%';
+
+  // force reflow ώστε η transition να ξεκινήσει
+  void barEl.offsetWidth;
+  barEl.style.transition = `width ${REVIEW_SECS}s linear`;
+  barEl.style.width = '0%';
+
+  const tick = () => {
+    secsLeft--;
+    cdEl.textContent = secsLeft;
+    if(secsLeft <= 0){
+      showDoneOverlay();
+    } else {
+      _reviewTimer = setTimeout(tick, 1000);
+    }
+  };
+  _reviewTimer = setTimeout(tick, 1000);
+
+  // ── 3. Κλείδωμα βάσης ────────────────────────────────────────
+  if(window._sbCurrentRaceId){
+    const nowIso = new Date().toISOString();
+    fetch(`${SB_URL}/rest/v1/races?id=eq.${window._sbCurrentRaceId}`,{
+      method:'PATCH', headers:{...SB_HDR,'Prefer':'return=minimal'},
+      body: JSON.stringify({cinema_played_at: nowIso})
+    }).catch(()=>{});
+    try{
+      const p=JSON.parse(localStorage.getItem('sfm_played')||'{}');
+      p[window._sbCurrentRaceId]=nowIso;
+      localStorage.setItem('sfm_played',JSON.stringify(p));
+    }catch(e){}
+  }
+}
+
+function showDoneOverlay(){
+  if(_reviewTimer){ clearTimeout(_reviewTimer); _reviewTimer=null; }
+  document.getElementById('reviewBanner').classList.remove('show');
+  const comp = raceData.competition||{};
+  document.getElementById('doneSub').textContent =
+    `${drawSteps.length} αθλητές · ${comp.title||''}`;
+  document.getElementById('doneOverlay').classList.add('show');
+}
+
+// ── SPEED
+document.getElementById('speedSlider').addEventListener('input',function(){
+  autoDelay=parseInt(this.value);
+  document.getElementById('speedVal').textContent=(autoDelay/1000).toFixed(1)+'s';
+});
+
+// ── KEYBOARD
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('introScreen').style.display!=='none')return;
+  if(e.code==='Space'||e.code==='ArrowRight'){e.preventDefault();if(!document.getElementById('btnNext').disabled&&!isAuto)nextStep();}
+  if(e.code==='KeyA')toggleAuto();
+  if(e.code==='Escape')skipAll();
+});
+
+// ── ALL EVENT LISTENERS (no inline onclick)
+
+// ── RECEIVE DATA FROM PARENT SFM ─────────────────
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'SFM_RACE_DATA') {
+    raceData = e.data.payload;
+    showIntroInfo();
+    setTimeout(() => startVisualization(), 200);
+  }
+});
+
+// ── SUPABASE CONFIG ──────────────────────────────────────
+const SB_URL='https://lnknyxaozoyxxiqqaswi.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxua255eGFvem95eHhpcXFhc3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzOTMxMTYsImV4cCI6MjA4OTk2OTExNn0.MA86SoUGaPsaIxzEvLNnx9oCoewqTG0ivUEVTN9jAwQ';
+const SB_HDR={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+window._sbCurrentRaceId=null;
+window._sbPendingLockId=null;
+
+function fmtPlayedAt(iso){try{const d=new Date(iso);return'Παρουσιάστηκε: '+d.toLocaleDateString('el-GR')+' '+d.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});}catch(e){return'';}}
+
+async function sbLoadRaces(){
+  const cont=document.getElementById('sbRaceContainer');
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/races?order=created_at.desc&limit=60&select=id,race_code,race_title,race_location,race_date,round_number,game_type,race_type,athletes,sectors,cinema_played_at',{headers:SB_HDR});
+    const races=await res.json();
+    if(!races.length){cont.innerHTML='<div class="sb-error">Δεν βρέθηκαν αγώνες.</div>';return;}
+    let played={};try{played=JSON.parse(localStorage.getItem('sfm_played')||'{}');}catch(e){}
+    let html='<div class="sb-race-list">';
+    races.forEach(r=>{
+      const hasAthletes=Array.isArray(r.athletes)&&r.athletes.length>0;
+      const playedAt=r.cinema_played_at||played[r.id]||null;
+      const isPlayed=hasAthletes&&!!playedAt;
+      const game=r.game_type==='float'||r.game_type==='match'?'ΦΕΛΛΟ':'CASTING';
+      let badge,cardCls,clickAttr;
+      if(!hasAthletes){badge='<span class="sb-rc-badge badge-nodraw">ΧΩΡΙΣ ΚΛΗΡΩΣΗ</span>';cardCls='sb-race-card';clickAttr='style="opacity:.4;pointer-events:none"';}
+      else if(isPlayed){badge='<span class="sb-rc-badge badge-played">🔒 ΠΑΙΧΤΗΚΕ</span>';cardCls='sb-race-card locked';clickAttr='onclick="sbLockClick('+r.id+',\''+encodeURIComponent(playedAt||'')+'\')"';}
+      else{badge='<span class="sb-rc-badge badge-ready">▶ ΕΤΟΙΜΗ</span>';cardCls='sb-race-card';clickAttr='onclick="sbSelectRace('+r.id+')"';}
+      html+=`<div class="${cardCls}" ${clickAttr}>${badge}
+        <div class="sb-rc-round">ΑΓΩΝΙΣΤΙΚΗ ${r.round_number||1} · ${game}</div>
+        <div class="sb-rc-title">${r.race_title||r.race_code||'—'}</div>
+        <div class="sb-rc-meta">
+          ${r.race_location?'<span>📍 '+r.race_location+'</span>':''}
+          ${r.race_date?'<span>📅 '+r.race_date+'</span>':''}
+          ${hasAthletes?'<span>👥 '+r.athletes.length+' αθλητές</span>':''}
+          ${isPlayed?'<span style="color:var(--gray3)">'+fmtPlayedAt(playedAt)+'</span>':''}
+        </div></div>`;
+    });
+    html+='</div>';
+    cont.innerHTML=html;
+  }catch(e){cont.innerHTML='<div class="sb-error">❌ Σφάλμα σύνδεσης:<br><small>'+e.message+'</small></div>';}
+}
+
+function sbLockClick(id,encodedDate){
+  window._sbPendingLockId=id;
+  document.getElementById('lockPlayedAt').textContent=fmtPlayedAt(decodeURIComponent(encodedDate));
+  document.getElementById('lockInput').value='';
+  document.getElementById('lockInput').classList.remove('err');
+  document.getElementById('lockModal').classList.add('open');
+  setTimeout(()=>document.getElementById('lockInput').focus(),250);
+}
+function lockClose(){document.getElementById('lockModal').classList.remove('open');window._sbPendingLockId=null;}
+async function lockConfirm(){
+  const inp=document.getElementById('lockInput');
+  const code=inp.value.trim().toUpperCase();
+  if(!code||!window._sbPendingLockId)return;
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/races?id=eq.'+window._sbPendingLockId+'&select=auth_code',{headers:SB_HDR});
+    const rows=await res.json();
+    const correct=(rows[0]?.auth_code||'').trim().toUpperCase();
+    if(!correct||code!==correct){inp.classList.add('err');setTimeout(()=>inp.classList.remove('err'),600);inp.value='';inp.focus();return;}
+    // Ξεκλείδωμα
+    await fetch(SB_URL+'/rest/v1/races?id=eq.'+window._sbPendingLockId,{method:'PATCH',headers:{...SB_HDR,'Prefer':'return=minimal'},body:JSON.stringify({cinema_played_at:null})});
+    try{const p=JSON.parse(localStorage.getItem('sfm_played')||'{}');delete p[window._sbPendingLockId];localStorage.setItem('sfm_played',JSON.stringify(p));}catch(e){}
+    lockClose();
+    sbSelectRace(window._sbPendingLockId||0);
+  }catch(e){inp.classList.add('err');setTimeout(()=>inp.classList.remove('err'),600);}
+}
+
+async function sbSelectRace(id){
+  const cont=document.getElementById('sbRaceContainer');
+  cont.innerHTML='<div class="sb-loading"><div class="sb-spinner"></div><div>Φόρτωση αγώνα…</div></div>';
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/races?id=eq.'+id+'&select=*',{headers:SB_HDR});
+    const rows=await res.json();
+    if(!rows.length)throw new Error('Δεν βρέθηκε ο αγώνας');
+    const r=rows[0];
+    window._sbCurrentRaceId=r.id;
+
+    // ── Φτιάχνω το raceData ΑΠΟ τη βάση ──────────────────────
+    // Σημείωση: scenario δεν αποθηκεύεται στη βάση — το βάζω
+    // ως 99 ώστε buildSteps να πέσει στο default που χρησιμοποιεί
+    // stored sector/position (αφού το sbBuildSteps το υπερκαλύπτει)
+    raceData = {
+      competition: {
+        title:        r.race_title    || r.race_code || '',
+        date:         r.race_date     || '',
+        location:     r.race_location || '',
+        scenario:     99,   // sentinel → sbBuildSteps override
+        pegsPerSector: r.pegs_per_sector || 7,
+        useVirtual:   true,
+        logos:        r.logos || {}
+      },
+      sectors:  (r.sectors  || []),
+      athletes: (r.athletes || []).map(a => ({
+        ...a,
+        _virtual: false,
+        group:    a.group || null
+      }))
+    };
+    showIntroInfo();
+  }catch(e){
+    cont.innerHTML='<div class="sb-error">❌ '+e.message+'</div>'
+      +'<div style="text-align:center;margin-top:14px">'
+      +'<button class="btn btn-gray" onclick="sbLoadRaces()">← Πίσω</button></div>';
+  }
+}
+
+// ── SUPABASE REPLAY buildSteps ─────────────────────────────────
+// Αναπαράγει τη λογική SC8:
+//   Φάση 1 → σύλλογοι με AO+O >= N (τυχαία σειρά, AO πρώτα μετά O)
+//   Φάση 2 → σύλλογοι με AO+O < N  (τυχαία σειρά)
+//   Φάση 3 → A αθλητές (τέλος)
+// N = συνολικοί τομείς (συμπεριλαμβανομένου τεχνητού)
+function sbBuildStepsFromDB(){
+  const secs  = raceData.sectors  || [];
+  const aths  = raceData.athletes.filter(a => !a._virtual && a.sector && a.position);
+  const N     = secs.length;
+
+  const pType   = a => (a.participationType || 'AO').toUpperCase();
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+  const mk      = a => ({ athlete:a, club:a.club||'—', sector:a.sector, position:a.position });
+
+  // Ομαδοποίηση AO+O ανά σύλλογο
+  const clubMap = {};
+  aths.forEach(a => {
+    const pt = pType(a);
+    if (pt !== 'AO' && pt !== 'O') return;
+    const c = a.club || '—';
+    if (!clubMap[c]) clubMap[c] = [];
+    clubMap[c].push(a);
+  });
+
+  const placed = new Set();
+
+  // ── Φάση 1: AO+O >= N ───────────────────────────────────────
+  const ph1 = [];
+  shuffle(Object.keys(clubMap).filter(c => clubMap[c].length >= N))
+    .forEach(c => {
+      const ao = shuffle(clubMap[c].filter(a => pType(a) === 'AO'));
+      const o  = shuffle(clubMap[c].filter(a => pType(a) === 'O'));
+      [...ao, ...o].forEach(a => { ph1.push(mk(a)); placed.add(a.id); });
+    });
+
+  // ── Φάση 2: 0 < AO+O < N ────────────────────────────────────
+  const ph2 = [];
+  shuffle(Object.keys(clubMap).filter(c => clubMap[c].length > 0 && clubMap[c].length < N))
+    .forEach(c => {
+      const ao = shuffle(clubMap[c].filter(a => pType(a) === 'AO'));
+      const o  = shuffle(clubMap[c].filter(a => pType(a) === 'O'));
+      [...ao, ...o].forEach(a => { ph2.push(mk(a)); placed.add(a.id); });
+    });
+
+  // ── Φάση 3: Α αθλητές (υπόλοιποι) ──────────────────────────
+  const ph3 = shuffle(aths.filter(a => !placed.has(a.id))).map(mk);
+
+  const phases = [];
+  if (ph1.length) phases.push({ label:'Φάση 1 — Πλήρεις Σύλλογοι', color:'#f0c419', steps: ph1 });
+  if (ph2.length) phases.push({ label:'Φάση 2 — Λοιποί AO',         color:'#4a9eca', steps: ph2 });
+  if (ph3.length) phases.push({ label:'Φάση 3 — Ατομικοί',           color:'#a0aec0', steps: ph3 });
+  return phases;
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('startBtn').addEventListener('click',startVisualization);
+  document.getElementById('btnNext').addEventListener('click',nextStep);
+  document.getElementById('btnAuto').addEventListener('click',toggleAuto);
+  document.getElementById('btnSkip').addEventListener('click',skipAll);
+  document.getElementById('doneCloseBtn').addEventListener('click',()=>{
+    document.getElementById('doneOverlay').classList.remove('show');
+    document.getElementById('introScreen').style.display='flex';
+    sbLoadRaces();
+  });
+  initTTS();
+  sbLoadRaces();
+});
+
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+</script>
+</body>
+</html>
