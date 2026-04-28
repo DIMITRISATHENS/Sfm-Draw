@@ -239,28 +239,23 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);borde
 .done-sub{font-size:16px;color:var(--gray2);animation:fadeIn .4s ease-out .6s both;}
 
 /* REVIEW BANNER — εμφανίζεται 60s μετά το finish, πριν το done overlay */
+/* REVIEW BANNER */
 #reviewBanner{
   position:fixed;bottom:0;left:0;right:0;z-index:150;
-  background:linear-gradient(135deg,rgba(6,14,24,.96),rgba(26,46,69,.98));
+  background:rgba(6,14,24,.92);
   border-top:2px solid var(--amber);
-  padding:10px 20px;
+  padding:5px 14px;
   display:none;
   align-items:center;
-  gap:14px;
+  gap:10px;
 }
 #reviewBanner.show{display:flex;}
-.rb-icon{font-size:28px;flex-shrink:0;}
-.rb-text{flex:1;}
-.rb-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:1px;color:var(--green2);}
-.rb-sub{font-size:12px;color:var(--gray2);margin-top:1px;}
-.rb-countdown{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:42px;font-weight:900;
-  color:var(--amber);
-  min-width:64px;text-align:center;
-  line-height:1;
-}
-.rb-bar-wrap{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:6px;overflow:hidden;}
+.rb-icon{font-size:16px;flex-shrink:0;}
+.rb-text{flex:1;min-width:0;}
+.rb-title{font-family:"Barlow Condensed",sans-serif;font-weight:900;font-size:12px;letter-spacing:1px;color:var(--green2);white-space:nowrap;}
+.rb-sub{font-size:10px;color:var(--gray2);}
+.rb-countdown{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:900;color:var(--amber);min-width:38px;text-align:center;line-height:1;flex-shrink:0;}
+.rb-bar-wrap{width:100%;height:2px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:3px;overflow:hidden;}
 .rb-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:2px;transition:width 1s linear;}
 
 /* FLASH */
