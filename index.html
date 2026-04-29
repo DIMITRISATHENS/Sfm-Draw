@@ -34,6 +34,11 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);h
    κρύβονται οι τελευταίες γραμμές. Το flex layout κάνει τα υπόλοιπα. */
 body.review-active .main{height:calc(100vh - 52px - 90px);}
 
+/* v2.4 — Όταν τελειώσει η κλήρωση, κρύβουμε το stage-wrap (το πάνω
+   showcase με τον τρέχων αθλητή) ώστε τα sector cards να απλώνονται
+   κατακόρυφα και να χωράνε όλα τα ονόματα χωρίς scroll/clipping. */
+body.review-active .stage-wrap{display:none;}
+
 /* LEFT */
 .left-area{display:flex;flex-direction:column;padding:10px 12px;gap:10px;overflow:hidden;}
 
@@ -268,6 +273,23 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);borde
 .rb-bar-wrap{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:6px;overflow:hidden;}
 .rb-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:2px;transition:width 1s linear;}
 
+/* v2.4 — Close button στη μπάρα: επιτρέπει στον διοργανωτή να κλείσει
+   τη review φάση χωρίς να περιμένει τα 60s */
+.rb-close{
+  flex-shrink:0;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  color:var(--white);
+  font-size:20px;font-weight:700;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s, transform .15s;
+  margin-left:6px;
+}
+.rb-close:hover{background:rgba(244,162,97,.25);border-color:var(--amber);transform:scale(1.06);}
+.rb-close:active{transform:scale(.94);}
+
 /* FLASH */
 .flash-overlay{position:fixed;inset:0;z-index:300;background:rgba(244,162,97,.15);pointer-events:none;opacity:0;transition:opacity .1s;}
 .flash-overlay.on{opacity:1;}
@@ -304,6 +326,8 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);borde
     <div class="rb-bar-wrap"><div class="rb-bar" id="rbBar" style="width:100%"></div></div>
   </div>
   <div class="rb-countdown" id="rbCountdown">60</div>
+  <!-- v2.4 — close button: skip του countdown -->
+  <button class="rb-close" id="rbCloseBtn" title="Κλείσιμο τώρα" onclick="showDoneOverlay()">×</button>
 </div>
 
 <!-- LOCK MODAL -->
