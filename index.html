@@ -945,8 +945,8 @@ async function sbLoadRaces(){
       const game=r.game_type==='float'||r.game_type==='match'?'ΦΕΛΛΟ':'CASTING';
       let badge,cardCls,clickAttr;
       if(!hasAthletes){badge='<span class="sb-rc-badge badge-nodraw">ΧΩΡΙΣ ΚΛΗΡΩΣΗ</span>';cardCls='sb-race-card';clickAttr='style="opacity:.4;pointer-events:none"';}
-      else if(isPlayed){badge='<span class="sb-rc-badge badge-played">🔒 ΠΑΙΧΤΗΚΕ</span>';cardCls='sb-race-card locked';clickAttr='onclick="sbLockClick('+r.id+',\''+encodeURIComponent(playedAt||'')+'\')"';}
-      else{badge='<span class="sb-rc-badge badge-ready">▶ ΕΤΟΙΜΗ</span>';cardCls='sb-race-card';clickAttr='onclick="sbSelectRace('+r.id+')"';}
+      else if(isPlayed){badge='<span class="sb-rc-badge badge-played">🔒 ΟΛΟΚΛΗΡΩΘΗΚΕ</span>';cardCls='sb-race-card locked';clickAttr='onclick="sbLockClick('+r.id+',\''+encodeURIComponent(playedAt||'')+'\')"';}
+      else{badge='<span class="sb-rc-badge badge-ready">▶ ΠΡΟΣ ΚΛΗΡΩΣΗ</span>';cardCls='sb-race-card';clickAttr='onclick="sbSelectRace('+r.id+')"';}
       html+=`<div class="${cardCls}" ${clickAttr}>${badge}
         <div class="sb-rc-round">ΑΓΩΝΙΣΤΙΚΗ ${r.round_number||1} · ${game}</div>
         <div class="sb-rc-title">${r.race_title||r.race_code||'—'}</div>
